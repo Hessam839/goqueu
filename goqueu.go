@@ -20,17 +20,20 @@ func (q *Queue) Enqueue(node *Node) {
 
 	if q.head == nil {
 		q.head = node
+		//q.head.ptr = nil
 		q.tail = node
+		//q.tail.ptr = nil
 		q.len++
 		return
 	}
 
 	q.tail.ptr = node
+	q.tail = node
 	q.len++
 	return
 }
 
-func (q *Queue) Dequeue() (*Node, error) {
+func (q *Queue) Dequeue() (interface{}, error) {
 	q.lock.Lock()
 	defer q.lock.Unlock()
 
@@ -40,7 +43,9 @@ func (q *Queue) Dequeue() (*Node, error) {
 
 	node := q.head
 	q.head = q.head.ptr
-	return node, nil
+	q.len--
+	node.ptr = nil
+	return node.data, nil
 }
 
 func (q *Queue) Len() int32 {

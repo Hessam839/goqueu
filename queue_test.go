@@ -7,12 +7,16 @@ import (
 
 func Test_Enqueue(t *testing.T) {
 	q := NewQueue()
-	q.Enqueue(&Node{data: "hello world", ptr: nil})
-	q.Enqueue(&Node{data: "my name is hessam", ptr: nil})
-	q.Enqueue(&Node{data: 12, ptr: nil})
+	q.Enqueue(&Node{data: "hello world"})
+	q.Enqueue(&Node{data: "my name is hessam"})
+	q.Enqueue(&Node{data: 12})
+	q.Enqueue(&Node{data: "hello world"})
+	q.Enqueue(&Node{data: "my name is hessam"})
+	q.Enqueue(&Node{data: 12})
 
-	var i int32
-	for i = 0; i < q.Len(); i++ {
+	l := q.Len()
+	log.Printf("queue length: %d", l)
+	for i := int32(0); i < l; i++ {
 		node, err := q.Dequeue()
 		if err != nil {
 			log.Fatal(err)
