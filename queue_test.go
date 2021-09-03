@@ -26,3 +26,14 @@ func Test_Enqueue(t *testing.T) {
 	}
 
 }
+
+func BenchmarkEnqueue(b *testing.B) {
+	q := NewQueue()
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		q.Enqueue(&Node{data: "hello world"})
+		q.Enqueue(&Node{data: []byte("my name is hessam")})
+		q.Enqueue(&Node{data: 12})
+	}
+}
