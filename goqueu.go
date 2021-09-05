@@ -19,7 +19,7 @@ func NewQueue() *Queue {
 func (q *Queue) Enqueue(data interface{}) {
 	q.notEmpty.L.Lock()
 	defer q.notEmpty.L.Unlock()
-	node := &Node{data: data, ptr: nil}
+	node := q.createNode(data)
 
 	if q.head == nil {
 		q.head = node
@@ -33,8 +33,6 @@ func (q *Queue) Enqueue(data interface{}) {
 	q.tail = node
 	atomic.AddInt32(&q.len, 1)
 	q.len++
-
-	q.notEmpty.Signal()
 }
 
 func (q *Queue) Dequeue() (interface{}, error) {
@@ -54,7 +52,7 @@ func (q *Queue) Dequeue() (interface{}, error) {
 	return node.data, nil
 }
 
-func (q *Queue) Dequeueb() interface{} {
+func (q *Queue) DequeueB() interface{} {
 	q.notEmpty.L.Lock()
 	defer q.notEmpty.L.Unlock()
 
@@ -78,4 +76,6 @@ func (q *Queue) Len() int32 {
 	return q.len
 }
 
-//func (q *Queue)  {}
+func (q *Queue) createNode(data interface{}) *Node {
+	return &Node{data: data}
+}

@@ -60,7 +60,7 @@ func BenchmarkEnqueue_Parallel(b *testing.B) {
 		b.ResetTimer()
 		b.RunParallel(func(pb *testing.PB) {
 			for pb.Next() {
-				q.Dequeue()
+				_, _ = q.Dequeue()
 			}
 		})
 	})
@@ -90,7 +90,7 @@ func Test_Dequeueb(t *testing.T) {
 	for i := 0; i < 3; i++ {
 		go func(c int) {
 			for {
-				data := q.Dequeueb().(int)
+				data := q.DequeueB().(int)
 				log.Printf("consumer %d data is: %v", c, data)
 				time.Sleep(time.Millisecond * 100)
 			}
