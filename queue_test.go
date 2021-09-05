@@ -2,7 +2,9 @@ package goqueu
 
 import (
 	"log"
+	"math/rand"
 	"testing"
+	"time"
 )
 
 func Test_Enqueue(t *testing.T) {
@@ -39,12 +41,12 @@ func BenchmarkEnqueue(b *testing.B) {
 func BenchmarkEnqueue_Parallel(b *testing.B) {
 	q := NewQueue()
 	b.ReportAllocs()
-	b.SetParallelism(1000)
+	b.SetParallelism(10000)
 	b.ResetTimer()
 	//for i:=0 ;i<b.N; i++{
 	b.Run("enqueue", func(b *testing.B) {
 		b.ReportAllocs()
-		b.SetParallelism(1000)
+		b.SetParallelism(10000)
 		b.ResetTimer()
 		b.RunParallel(func(pb *testing.PB) {
 			for pb.Next() {
@@ -54,13 +56,45 @@ func BenchmarkEnqueue_Parallel(b *testing.B) {
 	})
 	b.Run("dequeue", func(b *testing.B) {
 		b.ReportAllocs()
-		b.SetParallelism(1000)
+		b.SetParallelism(10000)
 		b.ResetTimer()
 		b.RunParallel(func(pb *testing.PB) {
 			for pb.Next() {
-				_, _ = q.Dequeue()
+				q.Dequeue()
 			}
 		})
 	})
 	//}
+}
+
+func Test_Dequeueb(t *testing.T) {
+	q := NewQueue()
+	rand.Seed(time.Now().UTC().UnixNano())
+
+	log.Println("test started ...")
+
+	go func() {
+		//timer := time.NewTicker(time.Second * time.Duration(rand.Intn(3)))
+		//for range timer.C{
+		//	q.Enqueue(rand.Intn(30))
+		//}
+		for {
+			rnd := rand.Intn(30)
+			q.Enqueue(rnd)
+			//log.Printf("produce Value %d", rnd)
+			time.Sleep(time.Second)
+		}
+	}()
+
+	log.Println("start consumer ...")
+	for i := 0; i < 3; i++ {
+		go func(c int) {
+			for {
+				data := q.Dequeueb().(int)
+				log.Printf("consumer %d data is: %v", c, data)
+				time.Sleep(time.Millisecond * 100)
+			}
+		}(i)
+	}
+	select {}
 }
