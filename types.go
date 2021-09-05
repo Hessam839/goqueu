@@ -8,8 +8,8 @@ type Node struct {
 }
 
 type Queue struct {
-	head *Node
-	tail *Node
-	len  int32
-	lock sync.RWMutex
+	head     *Node
+	tail     *Node
+	len      int32
+	notEmpty *sync.Cond
 }
