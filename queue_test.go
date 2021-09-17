@@ -82,7 +82,7 @@ func Test_Dequeueb(t *testing.T) {
 			rnd := rand.Intn(30)
 			q.Enqueue(rnd)
 			//log.Printf("produce Value %d", rnd)
-			time.Sleep(time.Second)
+			time.Sleep(time.Second * 2)
 		}
 	}()
 
@@ -92,7 +92,7 @@ func Test_Dequeueb(t *testing.T) {
 			for {
 				data := q.DequeueB().(int)
 				log.Printf("consumer %d data is: %v", c, data)
-				time.Sleep(time.Millisecond * 100)
+				//time.Sleep(time.Millisecond * 100)
 			}
 		}(i)
 	}

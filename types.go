@@ -8,6 +8,7 @@ type Node struct {
 }
 
 type Queue struct {
+	poll     *sync.Pool
 	head     *Node
 	tail     *Node
 	len      int32

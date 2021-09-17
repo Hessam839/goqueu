@@ -7,19 +7,22 @@ import (
 )
 
 func NewQueue() *Queue {
-	l := &sync.RWMutex{}
 	return &Queue{
 		head:     nil,
 		tail:     nil,
 		len:      0,
-		notEmpty: sync.NewCond(l),
+		notEmpty: sync.NewCond(&sync.RWMutex{}),
+		poll: &sync.Pool{New: func() interface{} {
+			return &Node{}
+		}},
 	}
 }
 
 func (q *Queue) Enqueue(data interface{}) {
 	q.notEmpty.L.Lock()
 	defer q.notEmpty.L.Unlock()
-	node := q.createNode(data)
+	node := q.poll.Get().(*Node)
+	node.data = data
 
 	if q.head == nil {
 		q.head = node
@@ -32,7 +35,6 @@ func (q *Queue) Enqueue(data interface{}) {
 	q.tail.ptr = node
 	q.tail = node
 	atomic.AddInt32(&q.len, 1)
-	q.len++
 }
 
 func (q *Queue) Dequeue() (interface{}, error) {
@@ -48,8 +50,11 @@ func (q *Queue) Dequeue() (interface{}, error) {
 		q.tail = nil
 	}
 	q.head = q.head.ptr
+	data := node.data
+	q.poll.Put(node)
+
 	atomic.AddInt32(&q.len, -1)
-	return node.data, nil
+	return data, nil
 }
 
 func (q *Queue) DequeueB() interface{} {
@@ -74,8 +79,4 @@ func (q *Queue) Len() int32 {
 	defer q.notEmpty.L.Unlock()
 
 	return q.len
-}
-
-func (q *Queue) createNode(data interface{}) *Node {
-	return &Node{data: data}
 }
